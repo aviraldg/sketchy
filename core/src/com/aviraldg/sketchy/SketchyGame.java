@@ -3,6 +3,7 @@ package com.aviraldg.sketchy;
 import com.aviraldg.sketchy.util.MyDebugRenderer;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -31,6 +32,8 @@ public class SketchyGame extends ApplicationAdapter {
         debugRenderer = new MyDebugRenderer();
 
         camera = new OrthographicCamera();
+        MusicPlayer musicPlayer = new MusicPlayer();
+        musicPlayer.play();
 
         initObjects();
     }
