@@ -2,17 +2,17 @@ package com.aviraldg.sketchy;
 
 import com.aviraldg.sketchy.util.MyDebugRenderer;
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Scaling;
+
+import java.util.HashSet;
 
 public class SketchyGame extends ApplicationAdapter {
 	public static final String NAME = "World of Sketch";
@@ -22,6 +22,10 @@ public class SketchyGame extends ApplicationAdapter {
     private MyDebugRenderer debugRenderer;
     private World world;
     private OrthographicCamera camera;
+    private Texture camTexture;
+
+    public HashSet<ApplicationListener> adapters = new HashSet<ApplicationListener>();
+    static final String TAG = "SketchyGame";
 
     @Override
 	public void create () {
@@ -36,6 +40,9 @@ public class SketchyGame extends ApplicationAdapter {
         musicPlayer.play();
 
         initObjects();
+        for(ApplicationListener adapter: adapters) {
+            adapter.create();
+        }
     }
 
     private void initObjects() {
@@ -95,6 +102,9 @@ public class SketchyGame extends ApplicationAdapter {
         int viewportHeight = (int)size.y;
         Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
         camera.setToOrtho(false, viewportWidth, viewportHeight);
+        for(ApplicationListener adapter: adapters) {
+            adapter.resize(width, height);
+        }
     }
 
     private float accumulator = 0;
@@ -110,6 +120,19 @@ public class SketchyGame extends ApplicationAdapter {
         }
     }
 
+    /**
+     * Returns a GL texture name (used by Android for camera preview)
+     * @return int
+     */
+    int obtainGlTexture() {
+        if(camTexture == null)
+            camTexture = new Texture(2048, 2048, Pixmap.Format.RGB888);
+
+        camTexture.draw(new Pixmap(Gdx.files.internal("badlogic.jpg")), 0, 0);
+
+        return camTexture.getTextureObjectHandle();
+    }
+
     @Override
 	public void render () {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -120,6 +143,11 @@ public class SketchyGame extends ApplicationAdapter {
             for(int j=0; j<10; j++) {
                 batch.draw(img, i*img.getWidth(), j*img.getHeight());
             }
+        }
+
+        if(camTexture != null) {
+            Gdx.app.log(TAG, String.format("glTexture: %d", obtainGlTexture()));
+            batch.draw(camTexture, 0, 0);
         }
         batch.end();
 

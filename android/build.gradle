@@ -16,8 +16,8 @@ android {
     }
     defaultConfig {
         applicationId "com.aviraldg.sketchy"
-        minSdkVersion 8
-        targetSdkVersion 23
+        minSdkVersion 11
+        targetSdkVersion 22
     }
 }
 
